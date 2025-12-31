@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import InputDate from './components/InputDate.vue';
+import InputItem from './components/InputItem.vue';
 import InputPrice from './components/InputPrice.vue';
 import SelectCategory from './components/SelectCategory.vue';
 import SelectMethod from './components/SelectMethod.vue';
@@ -14,6 +15,7 @@ import SelectMethod from './components/SelectMethod.vue';
 
         <div class="form-container">
             <InputDate />
+            <InputItem />
             <InputPrice />
             <SelectCategory />
             <SelectMethod />
