@@ -80,6 +80,8 @@ const selectedTime = computed({
 
 .input-field {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 12px 16px;
   border: 1px solid #dcdfe6;
   border-radius: 8px;
