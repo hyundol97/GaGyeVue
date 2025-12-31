@@ -10,7 +10,7 @@ const currentStep = ref(1);
 const formData = ref({
     date: '',
     time: '',
-    item: '',
+    name: '',
     price: '',
     category: '',
     method: '',
@@ -23,7 +23,7 @@ const canProceed = computed(() => {
         case 1:
             return formData.value.date && formData.value.time;
         case 2:
-            return formData.value.item.trim().length > 2;
+            return formData.value.name.trim().length > 2;
         case 3:
             return parseInt(formData.value.price.replace(/[^0-9]/g, '')) > 0;
         case 4:
@@ -80,8 +80,8 @@ const submitForm = () => {
                 />
                 <InputItem
                     v-if="currentStep === 2"
-                    :modelValue="formData.item"
-                    @update:modelValue="val => (formData.item = val)"
+                    :modelValue="formData.name"
+                    @update:modelValue="val => (formData.name = val)"
                 />
                 <InputPrice
                     v-if="currentStep === 3"
@@ -136,6 +136,7 @@ const submitForm = () => {
 
 .header {
     text-align: center;
+    margin-top: 24px;
     margin-bottom: 32px;
 }
 
