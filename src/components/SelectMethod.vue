@@ -13,7 +13,7 @@ const paymentMethods = [
 
 <template>
     <div class="input-container">
-        <h3 class="step-title">4. 결제 방법을 선택하세요</h3>
+        <h3 class="step-title">5. 결제 방법을 선택하세요</h3>
         <div class="method-list">
             <div
                 v-for="method in paymentMethods"

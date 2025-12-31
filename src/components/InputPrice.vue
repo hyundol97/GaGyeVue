@@ -17,7 +17,7 @@ const onInput = (event: Event) => {
 
 <template>
     <div class="input-container">
-        <h3 class="step-title">2. 결제한 금액을 입력하세요</h3>
+        <h3 class="step-title">3. 결제한 금액을 입력하세요</h3>
         <div class="form-group">
             <label class="label">금액</label>
             <div class="price-input-wrapper">
@@ -44,7 +44,7 @@ const onInput = (event: Event) => {
 }
 
 .step-title {
-    color: #67c23a;
+    color: #909399;
     font-size: 18px;
     font-weight: 600;
     margin: 0 0 20px 0;
@@ -101,8 +101,8 @@ const onInput = (event: Event) => {
 
 .input-field:focus {
     outline: none;
-    border-color: #67c23a;
-    box-shadow: 0 0 0 2px rgba(103, 194, 58, 0.2);
+    border-color: #909399;
+    box-shadow: 0 0 0 2px rgba(144, 147, 153, 0.2);
 }
 
 .input-field:hover {

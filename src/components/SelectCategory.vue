@@ -17,7 +17,7 @@ const categories = [
 
 <template>
     <div class="input-container">
-        <h3 class="step-title">3. 결제한 항목의 카테고리를 선택하세요</h3>
+        <h3 class="step-title">4. 결제한 항목의 카테고리를 선택하세요</h3>
         <div class="category-grid">
             <div
                 v-for="category in categories"
