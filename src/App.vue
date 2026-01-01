@@ -7,8 +7,8 @@ import ExpenseForm from './components/ExpenseForm.vue';
 const currentView = ref<'login' | 'home' | 'form'>('login');
 const currentUser = ref('');
 
-const handleLogin = (username: string) => {
-    currentUser.value = username;
+const handleLogin = (userMail: string) => {
+    currentUser.value = userMail;
     currentView.value = 'home';
 };
 
@@ -37,7 +37,7 @@ const handleFormCancel = () => {
         <Login v-if="currentView === 'login'" @login="handleLogin" />
         <Home
             v-if="currentView === 'home'"
-            :username="currentUser"
+            :userMail="currentUser"
             @logout="handleLogout"
             @start-entry="startExpenseEntry"
         />
