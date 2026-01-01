@@ -32,6 +32,8 @@ const selectedMinute = computed({
 
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 const minutes = ['00', '30'];
+
+const today = new Date().toISOString().split('T')[0];
 </script>
 
 <template>
@@ -39,7 +41,7 @@ const minutes = ['00', '30'];
         <h3 class="step-title">1. 결제 일시를 입력하세요</h3>
         <div class="form-group">
             <label class="label">날짜</label>
-            <input v-model="selectedDate" type="date" class="input-field" />
+            <input v-model="selectedDate" type="date" :max="today" class="input-field" />
         </div>
         <div class="form-group">
             <label class="label">시간</label>
