@@ -66,7 +66,7 @@ const addExpense = async () => {
             date: formData.value.date,
             time: formData.value.time,
             name: formData.value.name,
-            price: formData.value.price,
+            price: formData.value.price.replace(/[^0-9]/g, ''),
             category: formData.value.category,
             method: formData.value.method,
         },
@@ -80,10 +80,12 @@ const addExpense = async () => {
 };
 
 const submitForm = async () => {
-    const result = await addExpense();
-
-    if (result) {
+    try {
+        await addExpense();
         emit('complete', formData.value);
+    } catch (error) {
+        console.error('저장 실패:', error);
+        alert('저장에 실패했습니다. 다시 시도해주세요.');
     }
 };
 </script>

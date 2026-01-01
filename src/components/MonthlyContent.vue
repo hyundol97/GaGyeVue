@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-
-const today = new Date();
+import { ref, computed, onMounted } from 'vue';
+import { supabase } from '../lib/supabase';
 
 const props = defineProps<{
     userMail: string;
@@ -12,9 +11,26 @@ const emit = defineEmits<{
     startEntry: [];
 }>();
 
-const annuallyTotalExpenses = ref([]);
+const today = new Date();
 
-const monthlyExpenses = ref([]);
+interface Expense {
+    id: string;
+    date: string;
+    name: string;
+    price: string;
+}
+
+const annuallyTotalExpenses = ref<Expense[]>([]);
+
+const monthlyExpenses = ref<Expense[]>([]);
+
+const currentYear = computed(() => {
+    return today.getFullYear();
+});
+
+const currentMonth = computed(() => {
+    return today.getMonth() + 1;
+});
 
 const annuallyTotalExpense = computed(() =>
     String(annuallyTotalExpenses.value.reduce((sum, expense) => sum + Number(expense.price), 0))
@@ -24,12 +40,37 @@ const monthlyTotalExpense = computed(() =>
     String(monthlyExpenses.value.reduce((sum, expense) => sum + Number(expense.price), 0))
 );
 
-const formatPrice = (price: string) => {
-    return price + '원';
+const formatPrice = (price: string | number) => {
+    return Number(price).toLocaleString() + '원';
 };
 
-const currentYear = computed(() => {
-    return today.getFullYear();
+const getExpensesByMonth = async () => {
+    const start = `${currentYear.value}-${String(currentMonth.value).padStart(2, '0')}-01`;
+    const end = `${currentYear.value}-${String(currentMonth.value).padStart(2, '0')}-31`;
+
+    const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .gte('date', start)
+        .lte('date', end)
+        .order('date', { ascending: false });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    return data;
+};
+
+onMounted(async () => {
+    const result = await getExpensesByMonth();
+
+    console.log('result!!!!!!!!!!!! ', result);
+
+    if (result) {
+        monthlyExpenses.value = result;
+    }
 });
 </script>
 
@@ -45,7 +86,7 @@ const currentYear = computed(() => {
             <div class="expense-list" v-if="monthlyExpenses">
                 <div
                     v-for="expense in monthlyExpenses.slice(0, 3)"
-                    :key="expense.date"
+                    :key="expense.id"
                     class="expense-item"
                 >
                     <span class="expense-date">{{ expense.date }}</span>

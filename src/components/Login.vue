@@ -11,16 +11,25 @@ const password = ref('');
 
 const handleLogin = async () => {
     if (userMail.value.trim() && password.value.trim()) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: userMail.value.trim(),
-            password: password.value.trim(),
-        });
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: userMail.value.trim(),
+                password: password.value.trim(),
+            });
 
-        if (error) {
-            throw error;
+            if (error) {
+                console.error('로그인 오류:', error.message);
+                alert('로그인에 실패했습니다.');
+                return;
+            }
+
+            if (data.user) {
+                emit('login', userMail.value);
+            }
+        } catch (error) {
+            console.error('로그인 오류:', error);
+            alert('로그인에 실패했습니다.');
         }
-        emit('login', userMail.value);
-        return data;
     }
 };
 </script>
