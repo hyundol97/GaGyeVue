@@ -1,16 +1,26 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { supabase } from '../lib/supabase';
 
 const emit = defineEmits<{
-    login: [username: string];
+    login: [userMail: string];
 }>();
 
-const username = ref('');
+const userMail = ref('');
 const password = ref('');
 
-const handleLogin = () => {
-    if (username.value.trim() && password.value.trim()) {
-        emit('login', username.value);
+const handleLogin = async () => {
+    if (userMail.value.trim() && password.value.trim()) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: userMail.value.trim(),
+            password: password.value.trim(),
+        });
+
+        if (error) {
+            throw error;
+        }
+        emit('login', userMail.value);
+        return data;
     }
 };
 </script>
@@ -18,12 +28,12 @@ const handleLogin = () => {
 <template>
     <div class="login-container">
         <div class="login-card">
-            <h2 class="login-title">가계부 로그인</h2>
+            <h2 class="login-title">로그인</h2>
             <div class="form-group">
                 <input
-                    v-model="username"
+                    v-model="userMail"
                     type="text"
-                    placeholder="사용자명"
+                    placeholder="이메일"
                     class="login-input"
                     @keyup.enter="handleLogin"
                 />

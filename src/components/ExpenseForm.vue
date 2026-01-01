@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { supabase } from '../lib/supabase';
+
 import InputDate from './InputDate.vue';
 import InputItem from './InputItem.vue';
 import InputPrice from './InputPrice.vue';
@@ -15,7 +17,7 @@ const currentStep = ref(1);
 const formData = ref({
     date: '',
     time: '',
-    item: '',
+    name: '',
     price: '',
     category: '',
     method: '',
@@ -28,7 +30,7 @@ const canProceed = computed(() => {
         case 1:
             return formData.value.date && formData.value.time;
         case 2:
-            return formData.value.item.trim().length >= 2;
+            return formData.value.name.trim().length >= 2;
         case 3:
             return parseInt(formData.value.price.replace(/[^0-9]/g, '')) > 0;
         case 4:
@@ -52,8 +54,37 @@ const prevStep = () => {
     }
 };
 
-const submitForm = () => {
-    emit('complete', formData.value);
+const addExpense = async () => {
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('로그인 필요');
+
+    const { data, error } = await supabase.from('expenses').insert([
+        {
+            date: formData.value.date,
+            time: formData.value.time,
+            name: formData.value.name,
+            price: formData.value.price,
+            category: formData.value.category,
+            method: formData.value.method,
+        },
+    ]);
+
+    if (error) {
+        throw error;
+    }
+
+    return data;
+};
+
+const submitForm = async () => {
+    const result = await addExpense();
+
+    if (result) {
+        emit('complete', formData.value);
+    }
 };
 </script>
 
@@ -85,8 +116,8 @@ const submitForm = () => {
                 />
                 <InputItem
                     v-if="currentStep === 2"
-                    :modelValue="formData.item"
-                    @update:modelValue="val => (formData.item = val)"
+                    :modelValue="formData.name"
+                    @update:modelValue="val => (formData.name = val)"
                 />
                 <InputPrice
                     v-if="currentStep === 3"
