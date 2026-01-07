@@ -12,6 +12,9 @@ const emit = defineEmits<{
 }>();
 
 const today = new Date();
+const isLoading = ref(true);
+const animatedMonthly = ref(0);
+const animatedAnnually = ref(0);
 
 interface Expense {
     id: string;
@@ -21,7 +24,6 @@ interface Expense {
 }
 
 const annuallyTotalExpenses = ref<Expense[]>([]);
-
 const monthlyExpenses = ref<Expense[]>([]);
 
 const currentYear = computed(() => {
@@ -44,32 +46,62 @@ const formatPrice = (price: string | number) => {
     return Number(price).toLocaleString() + '원';
 };
 
-const getExpensesByMonth = async () => {
-    const start = `${currentYear.value}-${String(currentMonth.value).padStart(2, '0')}-01`;
-    const end = `${currentYear.value}-${String(currentMonth.value).padStart(2, '0')}-31`;
+const animateNumber = (target: number, ref: any) => {
+    const duration = 1000;
+    const start = Date.now();
+    const startValue = ref.value;
+
+    const animate = () => {
+        const elapsed = Date.now() - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+
+        ref.value = Math.floor(startValue + (target - startValue) * easeOut);
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            ref.value = target;
+        }
+    };
+
+    requestAnimationFrame(animate);
+};
+
+const getExpensesByYear = async () => {
+    const start = `${currentYear.value}-01-01`;
+    const end = `${currentYear.value}-12-31`;
 
     const { data, error } = await supabase
         .from('expenses')
         .select('*')
         .gte('date', start)
         .lte('date', end)
-        .order('date', { ascending: false });
+        .order('created_at', { ascending: false });
 
     if (error) {
         console.error(error);
         return;
     }
 
-    return data;
+    return data || [];
 };
 
 onMounted(async () => {
-    const result = await getExpensesByMonth();
+    const yearData = await getExpensesByYear();
 
-    console.log('result!!!!!!!!!!!! ', result);
+    if (yearData) {
+        annuallyTotalExpenses.value = yearData;
 
-    if (result) {
-        monthlyExpenses.value = result;
+        const monthStr = String(currentMonth.value).padStart(2, '0');
+        monthlyExpenses.value = yearData.filter(expense =>
+            expense.date.startsWith(`${currentYear.value}-${monthStr}`)
+        );
+
+        isLoading.value = false;
+
+        animateNumber(Number(monthlyTotalExpense.value), animatedMonthly);
+        animateNumber(Number(annuallyTotalExpense.value), animatedAnnually);
     }
 });
 </script>
@@ -78,12 +110,16 @@ onMounted(async () => {
     <div class="stats-section">
         <div class="stat-card total">
             <h3>이번 달 총 지출</h3>
-            <p class="amount">{{ formatPrice(monthlyTotalExpense) }}</p>
+            <div v-if="isLoading" class="loading-spinner"></div>
+            <p v-else class="amount">{{ formatPrice(animatedMonthly) }}</p>
         </div>
 
         <div class="stat-card">
             <h3>최근 지출 내역</h3>
-            <div class="expense-list" v-if="monthlyExpenses">
+            <div v-if="isLoading" class="loading-list">
+                <div class="skeleton-item" v-for="i in 3" :key="i"></div>
+            </div>
+            <div v-else class="expense-list">
                 <div
                     v-for="expense in monthlyExpenses.slice(0, 3)"
                     :key="expense.id"
@@ -98,7 +134,8 @@ onMounted(async () => {
 
         <div class="stat-card total">
             <h3>{{ currentYear }} 누적 총 지출</h3>
-            <p class="amount">{{ formatPrice(annuallyTotalExpense) }}</p>
+            <div v-if="isLoading" class="loading-spinner"></div>
+            <p v-else class="amount">{{ formatPrice(animatedAnnually) }}</p>
         </div>
     </div>
 </template>
@@ -165,5 +202,47 @@ onMounted(async () => {
 .expense-amount {
     font-weight: 600;
     color: #333;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+.loading-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeleton-item {
+    height: 48px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
 }
 </style>
