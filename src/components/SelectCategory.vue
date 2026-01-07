@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 
 const props = defineProps<{
     modelValue: string;
@@ -16,14 +16,20 @@ const selectedCategory = computed({
 
 const categories = [
     { value: 'food', label: '식비', icon: '🍴' },
-    { value: 'transport', label: '교통비', icon: '🚗' },
     { value: 'shopping', label: '쇼핑', icon: '🛍️' },
-    { value: 'entertainment', label: '엔터테인먼트', icon: '🎬' },
+    { value: 'transport', label: '교통비', icon: '🚗' },
+    { value: 'utility', label: '공과금', icon: '💵' },
+    { value: 'entertainment', label: '여가생활', icon: '🎬' },
     { value: 'health', label: '건강/의료', icon: '🏥' },
     { value: 'education', label: '교육', icon: '📚' },
-    { value: 'utility', label: '공과금', icon: '💵' },
     { value: 'other', label: '기타', icon: '💼' },
 ];
+
+onMounted(() => {
+    if (!props.modelValue) {
+        emit('update:modelValue', 'food');
+    }
+});
 </script>
 
 <template>
@@ -69,17 +75,17 @@ const categories = [
 
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
 }
 
 .category-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 12px 8px;
+    padding: 8px 6px;
     border: 2px solid #f0f0f0;
-    border-radius: 12px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s;
     background: #fafafa;
@@ -88,22 +94,22 @@ const categories = [
 .category-item:hover {
     border-color: #e6a23c;
     background: #fdf6ec;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .category-item.active {
     border-color: #e6a23c;
     background: #fdf6ec;
-    box-shadow: 0 4px 12px rgba(230, 162, 60, 0.3);
+    box-shadow: 0 2px 8px rgba(230, 162, 60, 0.3);
 }
 
 .category-icon {
-    font-size: 24px;
-    margin-bottom: 8px;
+    font-size: 18px;
+    margin-bottom: 4px;
 }
 
 .category-label {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
     color: #606266;
     text-align: center;

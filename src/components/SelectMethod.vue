@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 
 const props = defineProps<{
     modelValue: string;
@@ -20,6 +20,12 @@ const paymentMethods = [
     { value: 'transfer', label: '계좌이체', icon: '🏦', description: '계좌이체로 결제' },
     { value: 'mobile', label: '모바일결제', icon: '📱', description: '모바일 앱으로 결제' },
 ];
+
+onMounted(() => {
+    if (!props.modelValue) {
+        emit('update:modelValue', 'card');
+    }
+});
 </script>
 
 <template>
