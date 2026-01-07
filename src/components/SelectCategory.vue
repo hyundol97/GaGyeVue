@@ -77,7 +77,7 @@ const categories = [
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 16px 12px;
+    padding: 12px 8px;
     border: 2px solid #f0f0f0;
     border-radius: 12px;
     cursor: pointer;

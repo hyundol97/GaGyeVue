@@ -69,19 +69,27 @@ const animateNumber = (target: number, ref: any) => {
 };
 
 const getExpensesByYear = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+        console.error('사용자 인증 필요');
+        return [];
+    }
+
     const start = `${currentYear.value}-01-01`;
     const end = `${currentYear.value}-12-31`;
 
     const { data, error } = await supabase
         .from('expenses')
         .select('*')
+        .eq('user_id', user.id)
         .gte('date', start)
         .lte('date', end)
         .order('created_at', { ascending: false });
 
     if (error) {
         console.error(error);
-        return;
+        return [];
     }
 
     return data || [];

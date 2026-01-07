@@ -13,6 +13,12 @@ const name = computed({
     get: () => props.modelValue,
     set: value => emit('update:modelValue', value),
 });
+
+const suggestions = ['커피', '마트', '티머니'];
+
+const setSuggestion = (suggestion: string) => {
+    name.value = suggestion;
+};
 </script>
 
 <template>
@@ -24,8 +30,18 @@ const name = computed({
                 v-model="name"
                 type="text"
                 class="input-field"
-                placeholder="예: 점심식사, 지하철 요금, 커피 등"
+                placeholder="예: 쇼핑, 점심식사, 티머니 충전, 커피 등"
             />
+            <div class="suggestions">
+                <button
+                    v-for="suggestion in suggestions"
+                    :key="suggestion"
+                    @click="setSuggestion(suggestion)"
+                    class="suggestion-btn"
+                >
+                    {{ suggestion }}
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -83,5 +99,28 @@ const name = computed({
 
 .input-field:hover {
     border-color: #c0c4cc;
+}
+
+.suggestions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.suggestion-btn {
+    padding: 6px 12px;
+    background: #f5f7fa;
+    border: 1px solid #e4e7ed;
+    border-radius: 16px;
+    font-size: 12px;
+    color: #606266;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.suggestion-btn:hover {
+    background: #67c23a;
+    color: white;
+    border-color: #67c23a;
 }
 </style>
