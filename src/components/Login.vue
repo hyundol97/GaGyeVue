@@ -8,6 +8,13 @@ const emit = defineEmits<{
 
 const userMail = ref('');
 const password = ref('');
+const emailDomain = '@naver.com';
+
+const handleEmailBlur = () => {
+    if (userMail.value && !userMail.value.includes('@')) {
+        userMail.value += emailDomain;
+    }
+};
 
 const handleLogin = async () => {
     if (userMail.value.trim() && password.value.trim()) {
@@ -39,13 +46,17 @@ const handleLogin = async () => {
         <div class="login-card">
             <h2 class="login-title">로그인</h2>
             <div class="form-group">
-                <input
-                    v-model="userMail"
-                    type="text"
-                    placeholder="이메일"
-                    class="login-input"
-                    @keyup.enter="handleLogin"
-                />
+                <div class="email-input-wrapper">
+                    <input
+                        v-model="userMail"
+                        type="text"
+                        placeholder="이메일"
+                        class="login-input email-input"
+                        @keyup.enter="handleLogin"
+                        @blur="handleEmailBlur"
+                    />
+                    <span v-if="userMail && !userMail.includes('@')" class="email-suffix">{{ emailDomain }}</span>
+                </div>
             </div>
             <div class="form-group">
                 <input
@@ -90,6 +101,24 @@ const handleLogin = async () => {
 
 .form-group {
     margin-bottom: 20px;
+}
+
+.email-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.email-input {
+    flex: 1;
+}
+
+.email-suffix {
+    position: absolute;
+    right: 16px;
+    color: #999;
+    pointer-events: none;
+    font-size: 16px;
 }
 
 .login-input {
