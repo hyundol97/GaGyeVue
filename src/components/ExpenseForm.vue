@@ -63,6 +63,7 @@ const addExpense = async () => {
 
     const { data, error } = await supabase.from('expenses').insert([
         {
+            user_id: user.id,
             date: formData.value.date,
             time: formData.value.time,
             name: formData.value.name,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MonthlyContent from './MonthlyContent.vue';
+import ExpensesDataContent from './ExpensesDataContent.vue';
 
 const props = defineProps<{
     userMail: string;
@@ -21,7 +21,7 @@ const emit = defineEmits<{
         <button @click="emit('startEntry')" class="add-expense-btn">+ 새 지출 입력</button>
 
         <div class="content">
-            <MonthlyContent :userMail="props.userMail" />
+            <ExpensesDataContent :userMail="props.userMail" />
         </div>
     </div>
 </template>

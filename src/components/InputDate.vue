@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 
 const props = defineProps<{
     modelValue: { date: string; time: string };
@@ -11,29 +11,43 @@ const emit = defineEmits<{
 
 const selectedDate = computed({
     get: () => props.modelValue.date,
-    set: value => emit('update:modelValue', { ...props.modelValue, date: value }),
+    set: (value: string | undefined) => {
+        if (value) {
+            emit('update:modelValue', { ...props.modelValue, date: value });
+        }
+    },
 });
 
 const selectedHour = computed({
     get: () => (props.modelValue.time ? props.modelValue.time.split(':')[0] : ''),
-    set: value => {
-        const minute = props.modelValue.time ? props.modelValue.time.split(':')[1] : '00';
-        emit('update:modelValue', { ...props.modelValue, time: `${value}:${minute}` });
+    set: (value: string | undefined) => {
+        if (value) {
+            const minute = props.modelValue.time ? props.modelValue.time.split(':')[1] : '00';
+            emit('update:modelValue', { ...props.modelValue, time: `${value}:${minute}` });
+        }
     },
 });
 
 const selectedMinute = computed({
     get: () => (props.modelValue.time ? props.modelValue.time.split(':')[1] : ''),
-    set: value => {
-        const hour = props.modelValue.time ? props.modelValue.time.split(':')[0] : '00';
-        emit('update:modelValue', { ...props.modelValue, time: `${hour}:${value}` });
+    set: (value: string | undefined) => {
+        if (value) {
+            const hour = props.modelValue.time ? props.modelValue.time.split(':')[0] : '00';
+            emit('update:modelValue', { ...props.modelValue, time: `${hour}:${value}` });
+        }
     },
 });
 
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 const minutes = ['00', '30'];
 
-const today = new Date().toISOString().split('T')[0];
+const today: string = new Date().toISOString().split('T')[0]!;
+
+onMounted(() => {
+    if (!props.modelValue.date) {
+        emit('update:modelValue', { ...props.modelValue, date: today });
+    }
+});
 </script>
 
 <template>
@@ -106,6 +120,9 @@ const today = new Date().toISOString().split('T')[0];
     font-size: 14px;
     transition: all 0.3s;
     box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    overflow: hidden;
 }
 
 .time-selector {
