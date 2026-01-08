@@ -177,7 +177,16 @@ onMounted(async () => {
         <div class="stat-card total">
             <h3>이번 달 총 지출</h3>
             <div v-if="isLoading" class="loading-spinner"></div>
-            <p v-else class="amount">{{ formatPrice(animatedMonthly) }}</p>
+            <div v-else>
+                <p class="amount">
+                    {{ formatPrice(Number(monthlyTotalExpense) - Number(monthlyTotalIncome)) }}
+                </p>
+                <p class="net-amount">
+                    {{ formatPrice(animatedMonthly) }} (+{{
+                        formatPrice(Number(monthlyTotalIncome))
+                    }})
+                </p>
+            </div>
         </div>
 
         <ExpensesRecentlyContent :is-loading="isLoading" :monthly-expenses="monthlyExpenses" />
@@ -185,7 +194,16 @@ onMounted(async () => {
         <div class="stat-card total">
             <h3>{{ currentYear }} 누적 총 지출</h3>
             <div v-if="isLoading" class="loading-spinner"></div>
-            <p v-else class="amount">{{ formatPrice(animatedAnnually) }}</p>
+            <div v-else>
+                <p class="amount">
+                    {{ formatPrice(Number(annuallyTotalExpense) - Number(annuallyTotalIncome)) }}
+                </p>
+                <p class="net-amount">
+                    {{ formatPrice(animatedAnnually) }} (+{{
+                        formatPrice(Number(annuallyTotalIncome))
+                    }})
+                </p>
+            </div>
         </div>
     </div>
 </template>
@@ -220,7 +238,14 @@ onMounted(async () => {
     font-size: 32px;
     font-weight: 700;
     color: #667eea;
+    margin: 0 0 8px 0;
+}
+
+.net-amount {
+    font-size: 14px;
+    color: #666;
     margin: 0;
+    font-weight: 500;
 }
 
 .expense-list {
