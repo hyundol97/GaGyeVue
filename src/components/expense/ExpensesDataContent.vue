@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
+
+import ExpensesRecentlyContent from './ExpensesRecentlyContent.vue';
 
 const props = defineProps<{
     userMail: string;
@@ -8,7 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     logout: [];
-    startEntry: [];
+    startExpense: [];
 }>();
 
 const today = new Date();
@@ -23,8 +25,17 @@ interface Expense {
     price: string;
 }
 
+interface Income {
+    id: string;
+    date: string;
+    name: string;
+    price: string;
+}
+
 const annuallyTotalExpenses = ref<Expense[]>([]);
 const monthlyExpenses = ref<Expense[]>([]);
+const annuallyTotalIncomes = ref<Income[]>([]);
+const monthlyIncomes = ref<Income[]>([]);
 
 const currentYear = computed(() => {
     return today.getFullYear();
@@ -40,6 +51,14 @@ const annuallyTotalExpense = computed(() =>
 
 const monthlyTotalExpense = computed(() =>
     String(monthlyExpenses.value.reduce((sum, expense) => sum + Number(expense.price), 0))
+);
+
+const annuallyTotalIncome = computed(() =>
+    String(annuallyTotalIncomes.value.reduce((sum, expense) => sum + Number(expense.price), 0))
+);
+
+const monthlyTotalIncome = computed(() =>
+    String(monthlyIncomes.value.reduce((sum, expense) => sum + Number(expense.price), 0))
 );
 
 const formatPrice = (price: string | number) => {
@@ -69,8 +88,10 @@ const animateNumber = (target: number, ref: any) => {
 };
 
 const getExpensesByYear = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
         console.error('사용자 인증 필요');
         return [];
@@ -96,15 +117,51 @@ const getExpensesByYear = async () => {
     return data || [];
 };
 
-onMounted(async () => {
-    const yearData = await getExpensesByYear();
+const getIncomesByYear = async () => {
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
 
-    if (yearData) {
-        annuallyTotalExpenses.value = yearData;
+    if (!user) {
+        console.error('사용자 인증 필요');
+        return [];
+    }
+
+    const start = `${currentYear.value}-01-01`;
+    const end = `${currentYear.value}-12-31`;
+
+    const { data, error } = await supabase
+        .from('incomes')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('date', start)
+        .lte('date', end)
+        .order('date', { ascending: false })
+        .order('time', { ascending: false });
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return data || [];
+};
+
+onMounted(async () => {
+    const yearExpensesData = await getExpensesByYear();
+    const yearIncomesData = await getIncomesByYear();
+
+    if (yearExpensesData && yearIncomesData) {
+        annuallyTotalExpenses.value = yearExpensesData;
+        annuallyTotalIncomes.value = yearIncomesData;
 
         const monthStr = String(currentMonth.value).padStart(2, '0');
-        monthlyExpenses.value = yearData.filter(expense =>
+
+        monthlyExpenses.value = yearExpensesData.filter(expense =>
             expense.date.startsWith(`${currentYear.value}-${monthStr}`)
+        );
+        monthlyIncomes.value = yearIncomesData.filter(income =>
+            income.date.startsWith(`${currentYear.value}-${monthStr}`)
         );
 
         isLoading.value = false;
@@ -123,23 +180,7 @@ onMounted(async () => {
             <p v-else class="amount">{{ formatPrice(animatedMonthly) }}</p>
         </div>
 
-        <div class="stat-card">
-            <h3>최근 지출 내역</h3>
-            <div v-if="isLoading" class="loading-list">
-                <div class="skeleton-item" v-for="i in 3" :key="i"></div>
-            </div>
-            <div v-else class="expense-list">
-                <div
-                    v-for="expense in monthlyExpenses.slice(0, 3)"
-                    :key="expense.id"
-                    class="expense-item"
-                >
-                    <span class="expense-date">{{ expense.date }}</span>
-                    <span class="expense-item-name">{{ expense.name }}</span>
-                    <span class="expense-amount">{{ formatPrice(expense.price) }}</span>
-                </div>
-            </div>
-        </div>
+        <ExpensesRecentlyContent :is-loading="isLoading" :monthly-expenses="monthlyExpenses" />
 
         <div class="stat-card total">
             <h3>{{ currentYear }} 누적 총 지출</h3>
