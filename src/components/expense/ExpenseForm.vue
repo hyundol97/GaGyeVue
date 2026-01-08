@@ -110,6 +110,7 @@ const submitForm = async () => {
                 <InputDate
                     v-if="currentStep === 1"
                     :modelValue="{ date: formData.date, time: formData.time }"
+                    type="expense"
                     @update:modelValue="
                         val => {
                             formData.date = val.date;
@@ -120,11 +121,13 @@ const submitForm = async () => {
                 <InputItem
                     v-if="currentStep === 2"
                     :modelValue="formData.name"
+                    type="expense"
                     @update:modelValue="val => (formData.name = val)"
                 />
                 <InputPrice
                     v-if="currentStep === 3"
                     :modelValue="formData.price"
+                    type="expense"
                     @update:modelValue="val => (formData.price = val)"
                 />
                 <SelectCategory

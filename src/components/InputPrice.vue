@@ -3,6 +3,7 @@ import { computed } from 'vue';
 
 const props = defineProps<{
     modelValue: string;
+    type: string;
 }>();
 
 const emit = defineEmits<{
@@ -19,6 +20,17 @@ const price = computed({
     set: value => emit('update:modelValue', value),
 });
 
+const title = computed(() => {
+    switch (props.type) {
+        case 'expense':
+            return '결제';
+        case 'income':
+            return '수입';
+        default:
+            return '결제';
+    }
+});
+
 const onInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
     const formatted = formatPrice(target.value);
@@ -28,7 +40,7 @@ const onInput = (event: Event) => {
 
 <template>
     <div class="input-container">
-        <h3 class="step-title">3. 결제한 금액을 입력하세요</h3>
+        <h3 class="step-title">3. {{ title }} 금액을 입력하세요</h3>
         <div class="form-group">
             <label class="label">금액</label>
             <div class="price-input-wrapper">
