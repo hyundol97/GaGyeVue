@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
-import InputDate from './InputDate.vue';
-import InputItem from './InputItem.vue';
-import InputPrice from './InputPrice.vue';
-import SelectCategory from './SelectCategory.vue';
-import SelectMethod from './SelectMethod.vue';
+import InputDate from '../InputDate.vue';
+import InputItem from '../InputItem.vue';
+import InputPrice from '../InputPrice.vue';
 
 const emit = defineEmits<{
     complete: [data: any];
@@ -19,11 +17,9 @@ const formData = ref({
     time: '',
     name: '',
     price: '',
-    category: '',
-    method: '',
 });
 
-const totalSteps = 5;
+const totalSteps = 3;
 
 const canProceed = computed(() => {
     switch (currentStep.value) {
@@ -33,10 +29,6 @@ const canProceed = computed(() => {
             return formData.value.name.trim().length >= 2;
         case 3:
             return parseInt(formData.value.price.replace(/[^0-9]/g, '')) > 0;
-        case 4:
-            return formData.value.category;
-        case 5:
-            return formData.value.method;
         default:
             return false;
     }
@@ -54,22 +46,20 @@ const prevStep = () => {
     }
 };
 
-const addExpense = async () => {
+const addIncome = async () => {
     const {
         data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) throw new Error('로그인 필요');
 
-    const { data, error } = await supabase.from('expenses').insert([
+    const { data, error } = await supabase.from('incomes').insert([
         {
             user_id: user.id,
             date: formData.value.date,
             time: formData.value.time,
             name: formData.value.name,
             price: formData.value.price.replace(/[^0-9]/g, ''),
-            category: formData.value.category,
-            method: formData.value.method,
         },
     ]);
 
@@ -82,7 +72,7 @@ const addExpense = async () => {
 
 const submitForm = async () => {
     try {
-        await addExpense();
+        await addIncome();
         emit('complete', formData.value);
     } catch (error) {
         console.error('저장 실패:', error);
@@ -95,7 +85,7 @@ const submitForm = async () => {
     <div class="form-container">
         <div class="header">
             <button @click="emit('cancel')" class="back-btn">◀️ 홈</button>
-            <h1 class="form-title">가계부 입력</h1>
+            <h1 class="form-title">수입 입력</h1>
             <div class="progress-bar">
                 <div
                     class="progress"
@@ -126,16 +116,6 @@ const submitForm = async () => {
                     v-if="currentStep === 3"
                     :modelValue="formData.price"
                     @update:modelValue="val => (formData.price = val)"
-                />
-                <SelectCategory
-                    v-if="currentStep === 4"
-                    :modelValue="formData.category"
-                    @update:modelValue="val => (formData.category = val)"
-                />
-                <SelectMethod
-                    v-if="currentStep === 5"
-                    :modelValue="formData.method"
-                    @update:modelValue="val => (formData.method = val)"
                 />
             </div>
 
@@ -169,7 +149,7 @@ const submitForm = async () => {
 <style scoped>
 .form-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
     padding: 20px;
 }
 
@@ -265,7 +245,7 @@ const submitForm = async () => {
 .next-btn,
 .submit-btn {
     background: white;
-    color: #667eea;
+    color: #4caf50;
 }
 
 .next-btn:hover,

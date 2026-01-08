@@ -2,9 +2,10 @@
 import { ref } from 'vue';
 import Login from './components/Login.vue';
 import Home from './components/Home.vue';
-import ExpenseForm from './components/ExpenseForm.vue';
+import ExpenseForm from './components/expense/ExpenseForm.vue';
+import IncomeForm from './components/income/IncomeForm.vue';
 
-const currentView = ref<'login' | 'home' | 'form'>('login');
+const currentView = ref<'login' | 'home' | 'expenseForm' | 'incomeForm'>('login');
 const currentUser = ref('');
 
 const handleLogin = (userMail: string) => {
@@ -18,7 +19,11 @@ const handleLogout = () => {
 };
 
 const startExpenseEntry = () => {
-    currentView.value = 'form';
+    currentView.value = 'expenseForm';
+};
+
+const startIncomeEntry = () => {
+    currentView.value = 'incomeForm';
 };
 
 const handleFormComplete = (data: any) => {
@@ -39,10 +44,16 @@ const handleFormCancel = () => {
             v-if="currentView === 'home'"
             :userMail="currentUser"
             @logout="handleLogout"
-            @start-entry="startExpenseEntry"
+            @start-expense="startExpenseEntry"
+            @start-income="startIncomeEntry"
         />
         <ExpenseForm
-            v-if="currentView === 'form'"
+            v-if="currentView === 'expenseForm'"
+            @complete="handleFormComplete"
+            @cancel="handleFormCancel"
+        />
+        <IncomeForm
+            v-if="currentView === 'incomeForm'"
             @complete="handleFormComplete"
             @cancel="handleFormCancel"
         />
