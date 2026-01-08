@@ -85,7 +85,8 @@ const getExpensesByYear = async () => {
         .eq('user_id', user.id)
         .gte('date', start)
         .lte('date', end)
-        .order('created_at', { ascending: false });
+        .order('date', { ascending: false })
+        .order('time', { ascending: false });
 
     if (error) {
         console.error(error);

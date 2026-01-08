@@ -10,7 +10,7 @@ const emit = defineEmits<{
 }>();
 
 const selectedCategory = computed({
-    get: () => props.modelValue,
+    get: () => props.modelValue || 'food',
     set: value => emit('update:modelValue', value),
 });
 
@@ -18,11 +18,13 @@ const categories = [
     { value: 'food', label: '식비', icon: '🍴' },
     { value: 'shopping', label: '쇼핑', icon: '🛍️' },
     { value: 'transport', label: '교통비', icon: '🚗' },
-    { value: 'utility', label: '공과금', icon: '💵' },
+    { value: 'utility', label: '고정지출', icon: '💼' },
+    { value: 'household', label: '생활용품', icon: '' },
+    { value: 'saving', label: '저축', icon: '👛' },
     { value: 'entertainment', label: '여가생활', icon: '🎬' },
     { value: 'health', label: '건강/의료', icon: '🏥' },
     { value: 'education', label: '교육', icon: '📚' },
-    { value: 'other', label: '기타', icon: '💼' },
+    { value: 'other', label: '기타', icon: '🛠️' },
 ];
 
 onMounted(() => {
