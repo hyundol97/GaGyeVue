@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue';
 
 const props = defineProps<{
     modelValue: { date: string; time: string };
+    type: string;
 }>();
 
 const emit = defineEmits<{
@@ -38,6 +39,17 @@ const selectedMinute = computed({
     },
 });
 
+const title = computed(() => {
+    switch (props.type) {
+        case 'expense':
+            return '결제';
+        case 'income':
+            return '수입';
+        default:
+            return '결제';
+    }
+});
+
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 const minutes = ['00', '30'];
 
@@ -52,7 +64,7 @@ onMounted(() => {
 
 <template>
     <div class="input-container">
-        <h3 class="step-title">1. 결제 일시를 입력하세요</h3>
+        <h3 class="step-title">1. {{ title }} 일시를 입력하세요</h3>
         <div class="form-group">
             <label class="label">날짜</label>
             <input v-model="selectedDate" type="date" :max="today" class="input-field" />

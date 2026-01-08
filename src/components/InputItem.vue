@@ -3,6 +3,7 @@ import { computed } from 'vue';
 
 const props = defineProps<{
     modelValue: string;
+    type: string;
 }>();
 
 const emit = defineEmits<{
@@ -14,7 +15,27 @@ const name = computed({
     set: value => emit('update:modelValue', value),
 });
 
-const suggestions = ['커피', '마트', '티머니'];
+const title = computed(() => {
+    switch (props.type) {
+        case 'expense':
+            return '결제';
+        case 'income':
+            return '수입';
+        default:
+            return '결제';
+    }
+});
+
+const suggestions = computed(() => {
+    switch (props.type) {
+        case 'expense':
+            return ['커피', '마트', '티머니', '더치페이'];
+        case 'income':
+            return ['더치페이', '판매'];
+        default:
+            return [];
+    }
+});
 
 const setSuggestion = (suggestion: string) => {
     name.value = suggestion;
@@ -23,15 +44,10 @@ const setSuggestion = (suggestion: string) => {
 
 <template>
     <div class="input-container">
-        <h3 class="step-title">2. 결제 항목명을 입력하세요</h3>
+        <h3 class="step-title">2. {{ title }} 항목명을 입력하세요</h3>
         <div class="form-group">
             <label class="label">항목명</label>
-            <input
-                v-model="name"
-                type="text"
-                class="input-field"
-                placeholder="예: 쇼핑, 점심식사, 티머니 충전, 커피 등"
-            />
+            <input v-model="name" type="text" class="input-field" placeholder="입력하세요" />
             <div class="suggestions">
                 <button
                     v-for="suggestion in suggestions"

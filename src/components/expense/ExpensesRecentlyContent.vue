@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
 const props = defineProps<{
     isLoading: boolean;
     monthlyExpenses: Expense[];
@@ -13,8 +11,6 @@ interface Expense {
     price: string;
 }
 
-const monthlyExpenses = ref<Expense[]>([]);
-
 const formatPrice = (price: string | number) => {
     return Number(price).toLocaleString() + '원';
 };
@@ -23,12 +19,12 @@ const formatPrice = (price: string | number) => {
 <template>
     <div class="stat-card">
         <h3>최근 지출 내역</h3>
-        <div v-if="isLoading" class="loading-list">
+        <div v-if="props.isLoading" class="loading-list">
             <div class="skeleton-item" v-for="i in 3" :key="i"></div>
         </div>
         <div v-else class="expense-list">
             <div
-                v-for="expense in monthlyExpenses.slice(0, 3)"
+                v-for="expense in props.monthlyExpenses.slice(0, 3)"
                 :key="expense.id"
                 class="expense-item"
             >
@@ -43,7 +39,7 @@ const formatPrice = (price: string | number) => {
 <style scoped>
 .stat-card {
     background: white;
-    padding: 24px;
+    padding: 16px;
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
@@ -51,7 +47,7 @@ const formatPrice = (price: string | number) => {
 .stat-card h3 {
     color: #333;
     font-size: 16px;
-    margin: 0 0 16px 0;
+    margin: 0 0 12px 0;
     font-weight: 600;
 }
 

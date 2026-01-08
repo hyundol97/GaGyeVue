@@ -19,9 +19,10 @@ const emit = defineEmits<{
             <button @click="emit('logout')" class="logout-btn">로그아웃</button>
         </div>
 
-        <button @click="emit('startExpense')" class="add-expense-btn">+ 새 지출 입력</button>
-
-        <button @click="emit('startIncome')" class="add-income-btn">+ 새 수입 입력</button>
+        <div class="button-container">
+            <button @click="emit('startExpense')" class="add-expense-btn">+ 새 지출 입력</button>
+            <button @click="emit('startIncome')" class="add-income-btn">+ 새 수입 입력</button>
+        </div>
 
         <div class="content">
             <ExpensesDataContent :userMail="props.userMail" />
@@ -70,44 +71,48 @@ const emit = defineEmits<{
     margin: 0 auto;
 }
 
+.button-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
 .add-expense-btn {
-    width: 100%;
-    padding: 20px;
+    flex: 1;
+    padding: 12px 16px;
     background: white;
     color: #667eea;
     border: none;
-    border-radius: 12px;
-    font-size: 18px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .add-expense-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .add-income-btn {
-    width: 100%;
-    padding: 20px;
+    flex: 1;
+    padding: 12px 16px;
     background: #4caf50;
     color: white;
     border: none;
-    border-radius: 12px;
-    font-size: 18px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
-    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
 
 .add-income-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
     background: #45a049;
 }
 </style>

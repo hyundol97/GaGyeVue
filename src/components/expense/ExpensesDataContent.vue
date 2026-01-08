@@ -218,7 +218,7 @@ onMounted(async () => {
 
 .stat-card {
     background: white;
-    padding: 24px;
+    padding: 16px;
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
@@ -230,7 +230,7 @@ onMounted(async () => {
 .stat-card h3 {
     color: #333;
     font-size: 16px;
-    margin: 0 0 16px 0;
+    margin: 0 0 12px 0;
     font-weight: 600;
 }
 
@@ -246,37 +246,6 @@ onMounted(async () => {
     color: #666;
     margin: 0;
     font-weight: 500;
-}
-
-.expense-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.expense-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.expense-date {
-    font-size: 12px;
-    color: #666;
-}
-
-.expense-item-name {
-    flex: 1;
-    margin-left: 12px;
-    font-weight: 500;
-}
-
-.expense-amount {
-    font-weight: 600;
-    color: #333;
 }
 
 .loading-spinner {
