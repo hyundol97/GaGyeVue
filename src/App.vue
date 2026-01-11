@@ -1,20 +1,27 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useAuthStore } from './stores/auth';
 import Login from './components/Login.vue';
 import Home from './components/Home.vue';
 import ExpenseForm from './components/expense/ExpenseForm.vue';
 import IncomeForm from './components/income/IncomeForm.vue';
 
+const authStore = useAuthStore();
 const currentView = ref<'login' | 'home' | 'expenseForm' | 'incomeForm'>('login');
-const currentUser = ref('');
 
-const handleLogin = (userMail: string) => {
-    currentUser.value = userMail;
+onMounted(async () => {
+    const user = await authStore.fetchUser();
+    if (user) {
+        currentView.value = 'home';
+    }
+});
+
+const handleLogin = () => {
     currentView.value = 'home';
 };
 
-const handleLogout = () => {
-    currentUser.value = '';
+const handleLogout = async () => {
+    await authStore.logout();
     currentView.value = 'login';
 };
 
@@ -42,18 +49,20 @@ const handleFormCancel = () => {
         <Login v-if="currentView === 'login'" @login="handleLogin" />
         <Home
             v-if="currentView === 'home'"
-            :userMail="currentUser"
+            :user="authStore.user"
             @logout="handleLogout"
             @start-expense="startExpenseEntry"
             @start-income="startIncomeEntry"
         />
         <ExpenseForm
             v-if="currentView === 'expenseForm'"
+            :user="authStore.user"
             @complete="handleFormComplete"
             @cancel="handleFormCancel"
         />
         <IncomeForm
             v-if="currentView === 'incomeForm'"
+            :user="authStore.user"
             @complete="handleFormComplete"
             @cancel="handleFormCancel"
         />
