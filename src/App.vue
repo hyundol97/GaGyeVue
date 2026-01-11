@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from './stores/auth';
+
 import Login from './components/Login.vue';
 import Home from './components/Home.vue';
 import ExpenseForm from './components/expense/ExpenseForm.vue';
