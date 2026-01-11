@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import ExpensesDataContent from './expense/ExpensesDataContent.vue';
+import type { User } from '@supabase/supabase-js';
 
 const props = defineProps<{
-    userMail: string;
+    user: User | null;
 }>();
 
 const emit = defineEmits<{
@@ -25,7 +26,7 @@ const emit = defineEmits<{
         </div>
 
         <div class="content">
-            <ExpensesDataContent :userMail="props.userMail" />
+            <ExpensesDataContent :user="props.user" />
         </div>
     </div>
 </template>

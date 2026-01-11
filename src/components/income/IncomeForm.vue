@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { supabase } from '../../lib/supabase';
+import type { User } from '@supabase/supabase-js';
 
 import InputDate from '../InputDate.vue';
 import InputItem from '../InputItem.vue';
 import InputPrice from '../InputPrice.vue';
+
+const props = defineProps<{
+    user: User | null;
+}>();
 
 const emit = defineEmits<{
     complete: [data: any];
@@ -47,15 +52,11 @@ const prevStep = () => {
 };
 
 const addIncome = async () => {
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) throw new Error('로그인 필요');
+    if (!props.user) throw new Error('로그인 필요');
 
     const { data, error } = await supabase.from('incomes').insert([
         {
-            user_id: user.id,
+            user_id: props.user.id,
             date: formData.value.date,
             time: formData.value.time,
             name: formData.value.name,

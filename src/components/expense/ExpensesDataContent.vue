@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { supabase } from '../../lib/supabase';
+import type { User } from '@supabase/supabase-js';
 
 import ExpensesRecentlyContent from './ExpensesRecentlyContent.vue';
 
 const props = defineProps<{
-    userMail: string;
+    user: User | null;
 }>();
 
 const emit = defineEmits<{
@@ -88,14 +89,7 @@ const animateNumber = (target: number, ref: any) => {
 };
 
 const getExpensesByYear = async () => {
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        console.error('사용자 인증 필요');
-        return [];
-    }
+    if (!props.user) throw new Error('로그인 필요');
 
     const start = `${currentYear.value}-01-01`;
     const end = `${currentYear.value}-12-31`;
@@ -103,7 +97,7 @@ const getExpensesByYear = async () => {
     const { data, error } = await supabase
         .from('expenses')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', props.user.id)
         .gte('date', start)
         .lte('date', end)
         .order('date', { ascending: false })
@@ -118,14 +112,7 @@ const getExpensesByYear = async () => {
 };
 
 const getIncomesByYear = async () => {
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        console.error('사용자 인증 필요');
-        return [];
-    }
+    if (!props.user) throw new Error('로그인 필요');
 
     const start = `${currentYear.value}-01-01`;
     const end = `${currentYear.value}-12-31`;
@@ -133,7 +120,7 @@ const getIncomesByYear = async () => {
     const { data, error } = await supabase
         .from('incomes')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', props.user.id)
         .gte('date', start)
         .lte('date', end)
         .order('date', { ascending: false })
@@ -147,11 +134,20 @@ const getIncomesByYear = async () => {
     return data || [];
 };
 
-onMounted(async () => {
-    const yearExpensesData = await getExpensesByYear();
-    const yearIncomesData = await getIncomesByYear();
+const loadData = async () => {
+    console.log('loadData 호출됨, user:', props.user);
+    if (!props.user) {
+        console.log('user가 없어서 로딩 종료');
+        isLoading.value = false;
+        return;
+    }
 
-    if (yearExpensesData && yearIncomesData) {
+    try {
+        console.log('API 호출 시작');
+        const yearExpensesData = await getExpensesByYear();
+        const yearIncomesData = await getIncomesByYear();
+        console.log('API 응답:', { yearExpensesData, yearIncomesData });
+
         annuallyTotalExpenses.value = yearExpensesData;
         annuallyTotalIncomes.value = yearIncomesData;
 
@@ -164,12 +160,31 @@ onMounted(async () => {
             income.date.startsWith(`${currentYear.value}-${monthStr}`)
         );
 
+        console.log('필터링된 데이터:', {
+            monthlyExpenses: monthlyExpenses.value,
+            monthlyIncomes: monthlyIncomes.value,
+        });
+
         isLoading.value = false;
 
         animateNumber(Number(monthlyTotalExpense.value), animatedMonthly);
         animateNumber(Number(annuallyTotalExpense.value), animatedAnnually);
+    } catch (error) {
+        console.error('데이터 로드 실패:', error);
+        isLoading.value = false;
     }
-});
+};
+
+watch(
+    () => props.user,
+    async userData => {
+        if (userData) {
+            isLoading.value = true;
+            await loadData();
+        }
+    },
+    { immediate: true }
+);
 </script>
 
 <template>
