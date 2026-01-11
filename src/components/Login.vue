@@ -19,6 +19,12 @@ const handleEmailBlur = () => {
     }
 };
 
+const handleTestLogin = async () => {
+    userMail.value = 'tester1@naver.com';
+    password.value = '1234';
+    await handleLogin();
+};
+
 const handleLogin = async () => {
     if (userMail.value.trim() && password.value.trim()) {
         try {
@@ -59,7 +65,9 @@ const handleLogin = async () => {
                         @keyup.enter="handleLogin"
                         @blur="handleEmailBlur"
                     />
-                    <span v-if="userMail && !userMail.includes('@')" class="email-suffix">{{ emailDomain }}</span>
+                    <span v-if="userMail && !userMail.includes('@')" class="email-suffix">{{
+                        emailDomain
+                    }}</span>
                 </div>
             </div>
             <div class="form-group">
@@ -72,6 +80,7 @@ const handleLogin = async () => {
                 />
             </div>
             <button @click="handleLogin" class="login-btn">로그인</button>
+            <button @click="handleTestLogin" class="test-login-btn">테스트 계정 로그인</button>
         </div>
     </div>
 </template>
@@ -157,5 +166,24 @@ const handleLogin = async () => {
 .login-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.test-login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 12px;
+}
+
+.test-login-btn:hover {
+    background: #e9e9e9;
+    color: #333;
 }
 </style>
