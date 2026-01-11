@@ -18,6 +18,10 @@ const today = new Date();
 const isLoading = ref(true);
 const animatedMonthly = ref(0);
 const animatedAnnually = ref(0);
+const animatedMonthlyNet = ref(0);
+const animatedAnnuallyNet = ref(0);
+const animatedMonthlyIncome = ref(0);
+const animatedAnnuallyIncome = ref(0);
 
 interface Expense {
     id: string;
@@ -66,8 +70,7 @@ const formatPrice = (price: string | number) => {
     return Number(price).toLocaleString() + '원';
 };
 
-const animateNumber = (target: number, ref: any) => {
-    const duration = 1000;
+const animateNumber = (target: number, ref: any, duration: number = 1000) => {
     const start = Date.now();
     const startValue = ref.value;
 
@@ -135,18 +138,14 @@ const getIncomesByYear = async () => {
 };
 
 const loadData = async () => {
-    console.log('loadData 호출됨, user:', props.user);
     if (!props.user) {
-        console.log('user가 없어서 로딩 종료');
         isLoading.value = false;
         return;
     }
 
     try {
-        console.log('API 호출 시작');
         const yearExpensesData = await getExpensesByYear();
         const yearIncomesData = await getIncomesByYear();
-        console.log('API 응답:', { yearExpensesData, yearIncomesData });
 
         annuallyTotalExpenses.value = yearExpensesData;
         annuallyTotalIncomes.value = yearIncomesData;
@@ -160,15 +159,22 @@ const loadData = async () => {
             income.date.startsWith(`${currentYear.value}-${monthStr}`)
         );
 
-        console.log('필터링된 데이터:', {
-            monthlyExpenses: monthlyExpenses.value,
-            monthlyIncomes: monthlyIncomes.value,
-        });
-
         isLoading.value = false;
 
         animateNumber(Number(monthlyTotalExpense.value), animatedMonthly);
         animateNumber(Number(annuallyTotalExpense.value), animatedAnnually);
+        animateNumber(
+            Number(monthlyTotalExpense.value) - Number(monthlyTotalIncome.value),
+            animatedMonthlyNet,
+            1500
+        );
+        animateNumber(
+            Number(annuallyTotalExpense.value) - Number(annuallyTotalIncome.value),
+            animatedAnnuallyNet,
+            1500
+        );
+        animateNumber(Number(monthlyTotalIncome.value), animatedMonthlyIncome);
+        animateNumber(Number(annuallyTotalIncome.value), animatedAnnuallyIncome);
     } catch (error) {
         console.error('데이터 로드 실패:', error);
         isLoading.value = false;
@@ -194,12 +200,10 @@ watch(
             <div v-if="isLoading" class="loading-spinner"></div>
             <div v-else>
                 <p class="amount">
-                    {{ formatPrice(Number(monthlyTotalExpense) - Number(monthlyTotalIncome)) }}
+                    {{ formatPrice(animatedMonthlyNet) }}
                 </p>
                 <p class="net-amount">
-                    {{ formatPrice(animatedMonthly) }} (+{{
-                        formatPrice(Number(monthlyTotalIncome))
-                    }})
+                    {{ formatPrice(animatedMonthly) }} (+{{ formatPrice(animatedMonthlyIncome) }})
                 </p>
             </div>
         </div>
@@ -211,12 +215,10 @@ watch(
             <div v-if="isLoading" class="loading-spinner"></div>
             <div v-else>
                 <p class="amount">
-                    {{ formatPrice(Number(annuallyTotalExpense) - Number(annuallyTotalIncome)) }}
+                    {{ formatPrice(animatedAnnuallyNet) }}
                 </p>
                 <p class="net-amount">
-                    {{ formatPrice(animatedAnnually) }} (+{{
-                        formatPrice(Number(annuallyTotalIncome))
-                    }})
+                    {{ formatPrice(animatedAnnually) }} (+{{ formatPrice(animatedAnnuallyIncome) }})
                 </p>
             </div>
         </div>
