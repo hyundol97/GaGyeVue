@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import ExpensesDataContent from './expense/ExpensesDataContent.vue';
+import { ref, onMounted } from 'vue';
 import type { User } from '@supabase/supabase-js';
+
+import ExpensesDataContent from './expense/ExpensesDataContent.vue';
 
 const props = defineProps<{
     user: User | null;
@@ -11,12 +13,20 @@ const emit = defineEmits<{
     startExpense: [];
     startIncome: [];
 }>();
+
+const userName = ref('');
+
+onMounted(() => {
+    if (props.user && props.user.user_metadata) {
+        userName.value = props.user.user_metadata.display_name;
+    }
+});
 </script>
 
 <template>
     <div class="home-container">
         <div class="header">
-            <h1 class="home-title">송현석님의 가계부</h1>
+            <h1 class="home-title">{{ userName }}님의 가계부</h1>
             <button @click="emit('logout')" class="logout-btn">로그아웃</button>
         </div>
 
