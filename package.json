@@ -4,8 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "npm run open-browser && vite",
-        "open-browser": "start http://localhost:5173",
+        "dev": "node openBrowser.mjs && vite",
         "build": "vue-tsc -b && vite build",
         "preview": "vite preview"
     },

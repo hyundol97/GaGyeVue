@@ -1,5 +1,47 @@
-# Vue 3 + TypeScript + Vite
+# 프로젝트 소개
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+이 프로젝트는 **Vue.js**를 기반으로 제작되었습니다.  
+로컬 환경에서 개발 서버를 실행하여 손쉽게 확인할 수 있습니다.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## ⚙️ 개발 환경
+
+- **Node.js 버전:** 24.11.0
+- **패키지 매니저:** npm
+
+## 🚀 실행 방법
+
+1. 패키지 설치
+
+    ```bash
+    npm i
+    ```
+
+2. 개발 서버 실행
+
+    ```bash
+    npm run dev
+    ```
+
+3. 이하 주소에서 로컬 환경 확인
+
+    👉 http://localhost:5173
+
+## 📝 배포 및 블로그
+
+배포 링크: https://d366ozl1lmybii.cloudfront.net/
+
+## 💡 사용 기술
+
+### Main Skills
+
+- Vue.js
+- TypeScript
+
+### Sub Skills
+
+- Supabase
+- AWS
+
+## 📄 라이선스
+
+본 프로젝트는 개인 학습 및 포트폴리오 용도로 제작되었습니다.
