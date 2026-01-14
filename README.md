@@ -40,7 +40,7 @@
 ### Sub Skills
 
 - Supabase
-- AWS
+- AWS (S3, CloudFront)
 
 ## 📄 라이선스
 
