@@ -76,7 +76,7 @@ onMounted(() => {
 
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
 }
 
