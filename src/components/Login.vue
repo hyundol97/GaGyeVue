@@ -11,6 +11,7 @@ const emit = defineEmits<{
 
 const userMail = ref('');
 const password = ref('');
+const isLoading = ref(false);
 const emailDomain = '@naver.com';
 
 const handleEmailBlur = () => {
@@ -27,6 +28,7 @@ const handleTestLogin = async () => {
 
 const handleLogin = async () => {
     if (userMail.value.trim() && password.value.trim()) {
+        isLoading.value = true;
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: userMail.value.trim(),
@@ -46,6 +48,8 @@ const handleLogin = async () => {
         } catch (error) {
             console.error('로그인 오류:', error);
             alert('로그인에 실패했습니다.');
+        } finally {
+            isLoading.value = false;
         }
     }
 };
@@ -79,7 +83,10 @@ const handleLogin = async () => {
                     @keyup.enter="handleLogin"
                 />
             </div>
-            <button @click="handleLogin" class="login-btn">로그인</button>
+            <button @click="handleLogin" class="login-btn" :disabled="isLoading">
+                <span v-if="isLoading" class="spinner"></span>
+                {{ isLoading ? '로그인 중...' : '로그인' }}
+            </button>
             <button @click="handleTestLogin" class="test-login-btn">테스트 계정 로그인</button>
         </div>
     </div>
@@ -166,6 +173,29 @@ const handleLogin = async () => {
 .login-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .test-login-btn {
