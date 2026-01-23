@@ -16,6 +16,7 @@ const emit = defineEmits<{
 
 const today = new Date();
 const isLoading = ref(true);
+const activeTab = ref('monthly');
 const animatedMonthly = ref(0);
 const animatedAnnually = ref(0);
 const animatedMonthlyNet = ref(0);
@@ -194,38 +195,95 @@ watch(
 </script>
 
 <template>
-    <div class="stats-section">
-        <div class="stat-card total">
-            <h3>이번 달 총 지출</h3>
-            <div v-if="isLoading" class="loading-spinner"></div>
-            <div v-else>
-                <p class="amount">
-                    {{ formatPrice(animatedMonthlyNet) }}
-                </p>
-                <p class="net-amount">
-                    {{ formatPrice(animatedMonthly) }} (+{{ formatPrice(animatedMonthlyIncome) }})
-                </p>
-            </div>
+    <div class="tab-container">
+        <div class="tab-buttons">
+            <button :class="{ active: activeTab === 'monthly' }" @click="activeTab = 'monthly'">
+                {{ currentYear.toString().substring(2) + '년 ' + currentMonth + '월' }}
+            </button>
+            <button :class="{ active: activeTab === 'annually' }" @click="activeTab = 'annually'">
+                요약
+            </button>
         </div>
 
-        <ExpensesRecentlyContent :is-loading="isLoading" :monthly-expenses="monthlyExpenses" />
+        <div class="tab-content">
+            <div v-if="activeTab === 'monthly'" class="stats-section">
+                <div class="stat-card total">
+                    <h3>이번 달 총 지출</h3>
+                    <div v-if="isLoading" class="loading-spinner"></div>
+                    <div v-else>
+                        <p class="amount">
+                            {{ formatPrice(animatedMonthlyNet) }}
+                        </p>
+                        <p class="net-amount">
+                            {{ formatPrice(animatedMonthly) }} (+{{
+                                formatPrice(animatedMonthlyIncome)
+                            }})
+                        </p>
+                    </div>
+                </div>
 
-        <div class="stat-card total">
-            <h3>{{ currentYear }} 누적 총 지출</h3>
-            <div v-if="isLoading" class="loading-spinner"></div>
-            <div v-else>
-                <p class="amount">
-                    {{ formatPrice(animatedAnnuallyNet) }}
-                </p>
-                <p class="net-amount">
-                    {{ formatPrice(animatedAnnually) }} (+{{ formatPrice(animatedAnnuallyIncome) }})
-                </p>
+                <ExpensesRecentlyContent
+                    :is-loading="isLoading"
+                    :monthly-expenses="monthlyExpenses"
+                />
+            </div>
+
+            <div v-if="activeTab === 'annually'" class="stats-section">
+                <div class="stat-card total">
+                    <h3>{{ currentYear }} 누적 총 지출</h3>
+                    <div v-if="isLoading" class="loading-spinner"></div>
+                    <div v-else>
+                        <p class="amount">
+                            {{ formatPrice(animatedAnnuallyNet) }}
+                        </p>
+                        <p class="net-amount">
+                            {{ formatPrice(animatedAnnually) }} (+{{
+                                formatPrice(animatedAnnuallyIncome)
+                            }})
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
+.tab-container {
+    margin-bottom: 32px;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.tab-buttons button {
+    padding: 12px 24px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.tab-buttons button:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.tab-buttons button.active {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+.tab-content {
+    min-height: 200px;
+}
+
 .stats-section {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

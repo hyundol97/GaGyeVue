@@ -89,7 +89,7 @@ onMounted(() => {
 }
 
 .add-expense-btn {
-    flex: 1;
+    flex: 2;
     padding: 12px 16px;
     background: white;
     color: #667eea;
