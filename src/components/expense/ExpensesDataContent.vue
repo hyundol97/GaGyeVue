@@ -138,6 +138,39 @@ const getIncomesByYear = async () => {
     return data || [];
 };
 
+const animateTabData = (tab: string) => {
+    if (tab === 'monthly') {
+        animatedMonthly.value = 0;
+        animatedMonthlyNet.value = 0;
+        animatedMonthlyIncome.value = 0;
+        
+        animateNumber(Number(monthlyTotalExpense.value), animatedMonthly);
+        animateNumber(
+            Number(monthlyTotalExpense.value) - Number(monthlyTotalIncome.value),
+            animatedMonthlyNet,
+            1500
+        );
+        animateNumber(Number(monthlyTotalIncome.value), animatedMonthlyIncome);
+    } else {
+        animatedAnnually.value = 0;
+        animatedAnnuallyNet.value = 0;
+        animatedAnnuallyIncome.value = 0;
+        
+        animateNumber(Number(annuallyTotalExpense.value), animatedAnnually);
+        animateNumber(
+            Number(annuallyTotalExpense.value) - Number(annuallyTotalIncome.value),
+            animatedAnnuallyNet,
+            1500
+        );
+        animateNumber(Number(annuallyTotalIncome.value), animatedAnnuallyIncome);
+    }
+};
+
+const switchTab = (tab: string) => {
+    activeTab.value = tab;
+    animateTabData(tab);
+};
+
 const loadData = async () => {
     if (!props.user) {
         isLoading.value = false;
@@ -161,21 +194,7 @@ const loadData = async () => {
         );
 
         isLoading.value = false;
-
-        animateNumber(Number(monthlyTotalExpense.value), animatedMonthly);
-        animateNumber(Number(annuallyTotalExpense.value), animatedAnnually);
-        animateNumber(
-            Number(monthlyTotalExpense.value) - Number(monthlyTotalIncome.value),
-            animatedMonthlyNet,
-            1500
-        );
-        animateNumber(
-            Number(annuallyTotalExpense.value) - Number(annuallyTotalIncome.value),
-            animatedAnnuallyNet,
-            1500
-        );
-        animateNumber(Number(monthlyTotalIncome.value), animatedMonthlyIncome);
-        animateNumber(Number(annuallyTotalIncome.value), animatedAnnuallyIncome);
+        animateTabData(activeTab.value);
     } catch (error) {
         console.error('데이터 로드 실패:', error);
         isLoading.value = false;
@@ -197,10 +216,10 @@ watch(
 <template>
     <div class="tab-container">
         <div class="tab-buttons">
-            <button :class="{ active: activeTab === 'monthly' }" @click="activeTab = 'monthly'">
+            <button :class="{ active: activeTab === 'monthly' }" @click="switchTab('monthly')">
                 {{ currentYear.toString().substring(2) + '년 ' + currentMonth + '월' }}
             </button>
-            <button :class="{ active: activeTab === 'annually' }" @click="activeTab = 'annually'">
+            <button :class="{ active: activeTab === 'annually' }" @click="switchTab('annually')">
                 요약
             </button>
         </div>
