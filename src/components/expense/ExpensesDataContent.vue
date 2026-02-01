@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
 import ExpensesRecentlyContent from './ExpensesRecentlyContent.vue';
+import ExpensesCategorySummary from './ExpensesCategorySummary.vue';
 
 const props = defineProps<{
     user: User | null;
@@ -143,7 +144,7 @@ const animateTabData = (tab: string) => {
         animatedMonthly.value = 0;
         animatedMonthlyNet.value = 0;
         animatedMonthlyIncome.value = 0;
-        
+
         animateNumber(Number(monthlyTotalExpense.value), animatedMonthly);
         animateNumber(
             Number(monthlyTotalExpense.value) - Number(monthlyTotalIncome.value),
@@ -155,7 +156,7 @@ const animateTabData = (tab: string) => {
         animatedAnnually.value = 0;
         animatedAnnuallyNet.value = 0;
         animatedAnnuallyIncome.value = 0;
-        
+
         animateNumber(Number(annuallyTotalExpense.value), animatedAnnually);
         animateNumber(
             Number(annuallyTotalExpense.value) - Number(annuallyTotalIncome.value),
@@ -262,6 +263,12 @@ watch(
                         </p>
                     </div>
                 </div>
+
+                <ExpensesCategorySummary
+                    :is-loading="isLoading"
+                    :current-year="currentYear"
+                    :annually-total-expenses="annuallyTotalExpenses"
+                />
             </div>
         </div>
     </div>
