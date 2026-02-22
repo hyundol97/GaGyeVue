@@ -53,7 +53,12 @@ const title = computed(() => {
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 const minutes = ['00', '30'];
 
-const today: string = new Date().toISOString().split('T')[0]!;
+const now = new Date();
+const today = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+].join('-');
 
 onMounted(() => {
     if (!props.modelValue.date) {

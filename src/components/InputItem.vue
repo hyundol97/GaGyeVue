@@ -29,9 +29,9 @@ const title = computed(() => {
 const suggestions = computed(() => {
     switch (props.type) {
         case 'expense':
-            return ['커피', '마트', '티머니', '더치페이'];
+            return ['커피', '마트', '편의점', '티머니', '더치페이'];
         case 'income':
-            return ['더치페이', '판매'];
+            return ['더치페이', '판매', '용돈'];
         default:
             return [];
     }
@@ -119,6 +119,7 @@ const setSuggestion = (suggestion: string) => {
 
 .suggestions {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 8px;
 }
