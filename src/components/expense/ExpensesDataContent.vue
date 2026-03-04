@@ -299,7 +299,7 @@ watch(
                 @click="switchTab('monthly')"
                 class="tab-btn"
             >
-                {{ currentYear.toString().substring(2) + '년 ' + currentMonth + '월' }}
+                {{ selectedYear + '년 ' + selectedMonth + '월' }}
             </button>
             <button
                 :class="{ active: activeTab === 'annually' }"
@@ -330,6 +330,8 @@ watch(
                 <ExpensesRecentlyContent
                     :is-loading="isLoading"
                     :monthly-expenses="monthlyExpenses"
+                    :selected-year="selectedYear"
+                    :selected-month="selectedMonth"
                 />
             </div>
 

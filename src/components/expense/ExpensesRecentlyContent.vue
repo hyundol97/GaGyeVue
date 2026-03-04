@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import ExpensesModal from './ExpensesModal.vue';
+
 const props = defineProps<{
     isLoading: boolean;
     monthlyExpenses: Expense[];
+    selectedYear: number;
+    selectedMonth: number;
 }>();
 
 interface Expense {
@@ -11,14 +16,29 @@ interface Expense {
     price: string;
 }
 
+const showModal = ref(false);
+
 const formatPrice = (price: string | number) => {
     return Number(price).toLocaleString() + '원';
+};
+
+const openModal = () => {
+    showModal.value = true;
+};
+
+const closeModal = () => {
+    showModal.value = false;
 };
 </script>
 
 <template>
     <div class="stat-card">
-        <h3>최근 지출 내역</h3>
+        <div class="header">
+            <h3>최근 지출 내역</h3>
+            <button v-if="props.monthlyExpenses.length > 3" @click="openModal" class="more-btn">
+                더보기
+            </button>
+        </div>
         <div v-if="props.isLoading" class="loading-list">
             <div class="skeleton-item" v-for="i in 3" :key="i"></div>
         </div>
@@ -34,6 +54,14 @@ const formatPrice = (price: string | number) => {
             </div>
         </div>
     </div>
+
+    <ExpensesModal
+        v-if="showModal"
+        :expenses="props.monthlyExpenses"
+        :selected-year="props.selectedYear"
+        :selected-month="props.selectedMonth"
+        @close="closeModal"
+    />
 </template>
 
 <style scoped>
@@ -44,11 +72,34 @@ const formatPrice = (price: string | number) => {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
 .stat-card h3 {
     color: #333;
     font-size: 16px;
-    margin: 0 0 12px 0;
+    margin: 0;
     font-weight: 600;
+}
+
+.more-btn {
+    padding: 6px 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.more-btn:hover {
+    background: #5568d3;
 }
 
 .expense-list {
