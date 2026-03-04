@@ -18,6 +18,8 @@ const emit = defineEmits<{
 const today = new Date();
 const isLoading = ref(true);
 const activeTab = ref('monthly');
+const selectedYear = ref(today.getFullYear());
+const selectedMonth = ref(today.getMonth() + 1);
 const animatedMonthly = ref(0);
 const animatedAnnually = ref(0);
 const animatedMonthlyNet = ref(0);
@@ -50,6 +52,24 @@ const currentYear = computed(() => {
 
 const currentMonth = computed(() => {
     return today.getMonth() + 1;
+});
+
+const availableMonths = computed(() => {
+    const months = [];
+    const maxMonth = selectedYear.value === currentYear.value ? currentMonth.value : 12;
+    for (let i = 1; i <= maxMonth; i++) {
+        months.push(i);
+    }
+    return months;
+});
+
+const availableYears = computed(() => {
+    const years = [];
+    const startYear = 2026;
+    for (let i = startYear; i <= currentYear.value; i++) {
+        years.push(i);
+    }
+    return years;
 });
 
 const annuallyTotalExpense = computed(() =>
@@ -93,11 +113,11 @@ const animateNumber = (target: number, ref: any, duration: number = 1000) => {
     requestAnimationFrame(animate);
 };
 
-const getExpensesByYear = async () => {
+const getExpensesByYear = async (year: number) => {
     if (!props.user) throw new Error('로그인 필요');
 
-    const start = `${currentYear.value}-01-01`;
-    const end = `${currentYear.value}-12-31`;
+    const start = `${year}-01-01`;
+    const end = `${year}-12-31`;
 
     const { data, error } = await supabase
         .from('expenses')
@@ -116,11 +136,11 @@ const getExpensesByYear = async () => {
     return data || [];
 };
 
-const getIncomesByYear = async () => {
+const getIncomesByYear = async (year: number) => {
     if (!props.user) throw new Error('로그인 필요');
 
-    const start = `${currentYear.value}-01-01`;
-    const end = `${currentYear.value}-12-31`;
+    const start = `${year}-01-01`;
+    const end = `${year}-12-31`;
 
     const { data, error } = await supabase
         .from('incomes')
@@ -172,6 +192,44 @@ const switchTab = (tab: string) => {
     animateTabData(tab);
 };
 
+const switchMonth = (month: number) => {
+    selectedMonth.value = month;
+    filterMonthlyData();
+    animateTabData('monthly');
+};
+
+const switchYear = async (year: number) => {
+    selectedYear.value = year;
+    isLoading.value = true;
+
+    const yearExpensesData = await getExpensesByYear(year);
+    const yearIncomesData = await getIncomesByYear(year);
+
+    annuallyTotalExpenses.value = yearExpensesData;
+    annuallyTotalIncomes.value = yearIncomesData;
+
+    if (year === currentYear.value) {
+        selectedMonth.value = currentMonth.value;
+    } else {
+        selectedMonth.value = 12;
+    }
+
+    filterMonthlyData();
+    isLoading.value = false;
+    animateTabData(activeTab.value);
+};
+
+const filterMonthlyData = () => {
+    const monthStr = String(selectedMonth.value).padStart(2, '0');
+
+    monthlyExpenses.value = annuallyTotalExpenses.value.filter(expense =>
+        expense.date.startsWith(`${selectedYear.value}-${monthStr}`)
+    );
+    monthlyIncomes.value = annuallyTotalIncomes.value.filter(income =>
+        income.date.startsWith(`${selectedYear.value}-${monthStr}`)
+    );
+};
+
 const loadData = async () => {
     if (!props.user) {
         isLoading.value = false;
@@ -179,20 +237,14 @@ const loadData = async () => {
     }
 
     try {
-        const yearExpensesData = await getExpensesByYear();
-        const yearIncomesData = await getIncomesByYear();
+        const yearExpensesData = await getExpensesByYear(selectedYear.value);
+        const yearIncomesData = await getIncomesByYear(selectedYear.value);
 
         annuallyTotalExpenses.value = yearExpensesData;
         annuallyTotalIncomes.value = yearIncomesData;
 
-        const monthStr = String(currentMonth.value).padStart(2, '0');
-
-        monthlyExpenses.value = yearExpensesData.filter(expense =>
-            expense.date.startsWith(`${currentYear.value}-${monthStr}`)
-        );
-        monthlyIncomes.value = yearIncomesData.filter(income =>
-            income.date.startsWith(`${currentYear.value}-${monthStr}`)
-        );
+        selectedMonth.value = currentMonth.value;
+        filterMonthlyData();
 
         isLoading.value = false;
         animateTabData(activeTab.value);
@@ -217,10 +269,43 @@ watch(
 <template>
     <div class="tab-container">
         <div class="tab-buttons">
-            <button :class="{ active: activeTab === 'monthly' }" @click="switchTab('monthly')">
+            <div class="filter-container" v-if="activeTab === 'monthly'">
+                <select
+                    id="year-select"
+                    name="year"
+                    class="year-select"
+                    v-model="selectedYear"
+                    @change="switchYear(selectedYear)"
+                >
+                    <option v-for="year in availableYears" :key="year" :value="year">
+                        {{ year }}년
+                    </option>
+                </select>
+                <select
+                    id="month-select"
+                    name="month"
+                    class="month-select"
+                    v-model="selectedMonth"
+                    @change="switchMonth(selectedMonth)"
+                >
+                    <option v-for="month in availableMonths" :key="month" :value="month">
+                        {{ month }}월
+                    </option>
+                </select>
+            </div>
+            <button
+                v-else
+                :class="{ active: activeTab === 'monthly' }"
+                @click="switchTab('monthly')"
+                class="tab-btn"
+            >
                 {{ currentYear.toString().substring(2) + '년 ' + currentMonth + '월' }}
             </button>
-            <button :class="{ active: activeTab === 'annually' }" @click="switchTab('annually')">
+            <button
+                :class="{ active: activeTab === 'annually' }"
+                @click="switchTab('annually')"
+                class="tab-btn"
+            >
                 요약
             </button>
         </div>
@@ -285,22 +370,62 @@ watch(
     margin-bottom: 20px;
 }
 
-.tab-buttons button {
-    padding: 12px 24px;
+.filter-container {
+    display: flex;
+    gap: 6px;
+    flex: 2;
+}
+
+.year-select,
+.month-select {
+    padding: 8px 12px;
     border: 2px solid #e0e0e0;
     background: white;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
+    font-size: 13px;
     transition: all 0.2s ease;
+    outline: none;
 }
 
-.tab-buttons button:hover {
+.year-select:hover,
+.month-select:hover {
+    border-color: #667eea;
+}
+
+.year-select:focus,
+.month-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.year-select {
+    flex: 1;
+}
+
+.month-select {
+    flex: 1;
+}
+
+.tab-btn {
+    padding: 12px 32px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    flex: 1;
+}
+
+.tab-btn:hover {
     border-color: #667eea;
     color: #667eea;
 }
 
-.tab-buttons button.active {
+.tab-btn.active {
     background: #667eea;
     border-color: #667eea;
     color: white;

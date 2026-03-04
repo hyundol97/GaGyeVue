@@ -25,9 +25,9 @@ const categories = [
     { value: 'transport', label: '교통비', icon: '🚗' },
     { value: 'utility', label: '고정지출', icon: '💼' },
     { value: 'household', label: '생활용품', icon: '🛒' },
-    { value: 'entertainment', label: '여가생활', icon: '🎬' },
+    { value: 'entertainment', label: '취미/교육', icon: '🎬' },
     { value: 'health', label: '건강/의료', icon: '🏥' },
-    { value: 'education', label: '교육', icon: '📚' },
+    { value: 'relationship', label: '경조사/선물', icon: '🎁' },
     { value: 'other', label: '기타', icon: '🛠️' },
 ];
 
@@ -51,10 +51,12 @@ const categoryData = computed(() => {
         categoryMap.set(category, (categoryMap.get(category) || 0) + price);
     });
 
-    return categories.map(cat => ({
-        name: getCategoryLabel(cat.value),
-        value: categoryMap.get(cat.value) || 0
-    })).sort((a, b) => b.value - a.value);
+    return categories
+        .map(cat => ({
+            name: getCategoryLabel(cat.value),
+            value: categoryMap.get(cat.value) || 0,
+        }))
+        .sort((a, b) => b.value - a.value);
 });
 
 const initChart = () => {
