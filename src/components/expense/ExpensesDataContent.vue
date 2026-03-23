@@ -5,6 +5,7 @@ import type { User } from '@supabase/supabase-js';
 
 import ExpensesRecentlyContent from './ExpensesRecentlyContent.vue';
 import ExpensesCategorySummary from './ExpensesCategorySummary.vue';
+import ExpensesMethodSummary from './ExpensesMethodSummary.vue';
 
 const props = defineProps<{
     user: User | null;
@@ -352,6 +353,12 @@ watch(
                 </div>
 
                 <ExpensesCategorySummary
+                    :is-loading="isLoading"
+                    :current-year="currentYear"
+                    :annually-total-expenses="annuallyTotalExpenses"
+                />
+
+                <ExpensesMethodSummary
                     :is-loading="isLoading"
                     :current-year="currentYear"
                     :annually-total-expenses="annuallyTotalExpenses"
