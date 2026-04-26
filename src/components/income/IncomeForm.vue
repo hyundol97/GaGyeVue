@@ -17,6 +17,7 @@ const emit = defineEmits<{
 }>();
 
 const currentStep = ref(1);
+const isSubmitting = ref(false);
 const formData = ref({
     date: '',
     time: '',
@@ -72,12 +73,20 @@ const addIncome = async () => {
 };
 
 const submitForm = async () => {
+    if (isSubmitting.value) {
+        return;
+    }
+
+    isSubmitting.value = true;
+
     try {
         await addIncome();
         emit('complete', formData.value);
     } catch (error) {
         console.error('저장 실패:', error);
         alert('저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+        isSubmitting.value = false;
     }
 };
 </script>
@@ -139,9 +148,9 @@ const submitForm = async () => {
                 <button
                     v-if="currentStep === totalSteps"
                     @click="submitForm"
-                    :disabled="!canProceed"
+                    :disabled="!canProceed || isSubmitting"
                     class="nav-btn submit-btn"
-                    :class="{ disabled: !canProceed }"
+                    :class="{ disabled: !canProceed || isSubmitting }"
                 >
                     저장하기
                 </button>
