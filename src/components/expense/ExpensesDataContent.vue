@@ -31,6 +31,7 @@ const animatedAnnuallyIncome = ref(0);
 interface Expense {
     id: string;
     date: string;
+    time: string;
     name: string;
     price: string;
 }
@@ -38,6 +39,7 @@ interface Expense {
 interface Income {
     id: string;
     date: string;
+    time: string;
     name: string;
     price: string;
 }

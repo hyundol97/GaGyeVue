@@ -2,6 +2,7 @@
 interface Expense {
     id: string;
     date: string;
+    time: string;
     name: string;
     price: string;
 }
@@ -30,7 +31,11 @@ const formatPrice = (price: string | number) => {
             </div>
             <div class="modal-body">
                 <div v-for="expense in expenses" :key="expense.id" class="expense-item">
-                    <span class="expense-date">{{ expense.date }}</span>
+                    <div class="expense-date">
+                        <span>{{ expense.date }}</span>
+                        <span class="expense-time">{{ expense.time }}</span>
+                    </div>
+                    <div class="expense-divider"></div>
                     <span class="expense-item-name">{{ expense.name }}</span>
                     <span class="expense-amount">{{ formatPrice(expense.price) }}</span>
                 </div>
@@ -108,26 +113,45 @@ const formatPrice = (price: string | number) => {
 
 .expense-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    padding: 12px 16px;
     background: #f8f9fa;
     border-radius: 8px;
+    gap: 12px;
 }
 
 .expense-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 72px;
     font-size: 12px;
     color: #666;
 }
 
+.expense-time {
+    font-size: 11px;
+    color: #999;
+    margin-top: 2px;
+}
+
+.expense-divider {
+    width: 1px;
+    height: 32px;
+    background: #ddd;
+}
+
 .expense-item-name {
     flex: 1;
-    margin-left: 12px;
+    font-size: 14px;
     font-weight: 500;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .expense-amount {
     font-weight: 600;
-    color: #333;
 }
 </style>

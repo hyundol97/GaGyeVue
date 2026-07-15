@@ -15,9 +15,9 @@ const selectedMethod = computed({
 });
 
 const paymentMethods = [
-    { value: 'card', label: '신용카드', icon: '💳', description: '신용카드로 결제' },
+    { value: 'card', label: '카드', icon: '💳', description: '신용카드/체크카드 결제' },
     { value: 'cash', label: '현금', icon: '💵', description: '현금으로 결제' },
-    { value: 'transfer', label: '계좌이체', icon: '🏦', description: '계좌이체로 결제' },
+    { value: 'transfer', label: '계좌이체', icon: '🏦', description: '페이머니/계좌이체 결제' },
 ];
 
 onMounted(() => {

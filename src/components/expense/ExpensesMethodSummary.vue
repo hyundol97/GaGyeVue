@@ -20,14 +20,14 @@ const chartRef = ref<HTMLDivElement>();
 let chartInstance: echarts.ECharts | null = null;
 
 const paymentMethods = [
-    { value: 'card', label: '신용카드', icon: '💳' },
+    { value: 'card', label: '카드', icon: '💳' },
     { value: 'cash', label: '현금', icon: '💵' },
     { value: 'transfer', label: '계좌이체', icon: '🏦' },
 ];
 
 const getMethodLabel = (value: string) => {
     const method = paymentMethods.find(m => m.value === value);
-    return method ? `${method.icon} ${method.label}` : '💳 신용카드';
+    return method ? `${method.icon} ${method.label}` : '💳 카드';
 };
 
 const methodData = computed(() => {

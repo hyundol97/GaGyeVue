@@ -12,6 +12,7 @@ const props = defineProps<{
 interface Expense {
     id: string;
     date: string;
+    time: string;
     name: string;
     price: string;
 }
