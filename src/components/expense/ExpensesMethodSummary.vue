@@ -14,6 +14,8 @@ const props = defineProps<{
     isLoading: boolean;
     currentYear: number;
     annuallyTotalExpenses: Expense[];
+    monthlyExpenses?: Expense[];
+    selectedMonth?: number;
 }>();
 
 const chartRef = ref<HTMLDivElement>();
@@ -35,7 +37,8 @@ const methodData = computed(() => {
 
     paymentMethods.forEach(m => methodMap.set(m.value, 0));
 
-    props.annuallyTotalExpenses.forEach(expense => {
+    const ExpensesData = props.monthlyExpenses ?? props.annuallyTotalExpenses;
+    ExpensesData.forEach(expense => {
         const method = expense.method || 'card';
         const price = Number(expense.price);
         methodMap.set(method, (methodMap.get(method) || 0) + price);
@@ -101,7 +104,13 @@ watch(
 
 <template>
     <div class="category-summary">
-        <h3>{{ currentYear }} 결제 방법 통계</h3>
+        <h3>
+            {{
+                monthlyExpenses
+                    ? `${currentYear}년 ${selectedMonth}월 결제 방법 통계`
+                    : `${currentYear} 결제 방법 통계`
+            }}
+        </h3>
         <div v-if="isLoading" class="loading-spinner"></div>
         <div v-else-if="methodData.length === 0" class="no-data">데이터가 없습니다</div>
         <div v-else>

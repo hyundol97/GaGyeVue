@@ -195,9 +195,13 @@ const switchTab = (tab: string) => {
     animateTabData(tab);
 };
 
-const switchMonth = (month: number) => {
+const switchMonth = async (month: number) => {
     selectedMonth.value = month;
+    isLoading.value = true;
+    // 500ms 정도로 fase-in / out 애니메이션 추가.
+    await new Promise(resolve => setTimeout(resolve, 350));
     filterMonthlyData();
+    isLoading.value = false;
     animateTabData('monthly');
 };
 
@@ -314,29 +318,50 @@ watch(
         </div>
 
         <div class="tab-content">
-            <div v-if="activeTab === 'monthly'" class="stats-section">
-                <div class="stat-card total">
-                    <h3>이번 달 총 지출</h3>
-                    <div v-if="isLoading" class="loading-spinner"></div>
-                    <div v-else>
-                        <p class="amount">
-                            {{ formatPrice(animatedMonthlyNet) }}
-                        </p>
-                        <p class="net-amount">
-                            {{ formatPrice(animatedMonthly) }} (+{{
-                                formatPrice(animatedMonthlyIncome)
-                            }})
-                        </p>
+            <Transition name="fade" mode="out-in">
+                <div
+                    v-if="activeTab === 'monthly'"
+                    class="stats-section"
+                    :key="`${selectedYear}-${selectedMonth}`"
+                >
+                    <div class="stat-card total">
+                        <h3>이번 달 총 지출</h3>
+                        <div v-if="isLoading" class="loading-spinner"></div>
+                        <div v-else>
+                            <p class="amount">
+                                {{ formatPrice(animatedMonthlyNet) }}
+                            </p>
+                            <p class="net-amount">
+                                {{ formatPrice(animatedMonthly) }} (+{{
+                                    formatPrice(animatedMonthlyIncome)
+                                }})
+                            </p>
+                        </div>
                     </div>
-                </div>
 
-                <ExpensesRecentlyContent
-                    :is-loading="isLoading"
-                    :monthly-expenses="monthlyExpenses"
-                    :selected-year="selectedYear"
-                    :selected-month="selectedMonth"
-                />
-            </div>
+                    <ExpensesRecentlyContent
+                        :is-loading="isLoading"
+                        :monthly-expenses="monthlyExpenses"
+                        :selected-year="selectedYear"
+                        :selected-month="selectedMonth"
+                    />
+
+                    <ExpensesCategorySummary
+                        :is-loading="isLoading"
+                        :current-year="selectedYear"
+                        :annually-total-expenses="annuallyTotalExpenses"
+                        :monthly-expenses="monthlyExpenses"
+                        :selected-month="selectedMonth"
+                    />
+                    <ExpensesMethodSummary
+                        :is-loading="isLoading"
+                        :current-year="selectedYear"
+                        :annually-total-expenses="annuallyTotalExpenses"
+                        :monthly-expenses="monthlyExpenses"
+                        :selected-month="selectedMonth"
+                    />
+                </div>
+            </Transition>
 
             <div v-if="activeTab === 'annually'" class="stats-section">
                 <div class="stat-card total">
@@ -444,6 +469,23 @@ watch(
 
 .tab-content {
     min-height: 200px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+.fade-enter-from {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(-8px);
 }
 
 .stats-section {

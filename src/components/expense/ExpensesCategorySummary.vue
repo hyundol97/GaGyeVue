@@ -14,6 +14,8 @@ const props = defineProps<{
     isLoading: boolean;
     currentYear: number;
     annuallyTotalExpenses: Expense[];
+    monthlyExpenses?: Expense[];
+    selectedMonth?: number;
 }>();
 
 const chartRef = ref<HTMLDivElement>();
@@ -39,13 +41,12 @@ const getCategoryLabel = (value: string) => {
 const categoryData = computed(() => {
     const categoryMap = new Map<string, number>();
 
-    // 모든 카테고리를 0으로 초기화
     categories.forEach(cat => {
         categoryMap.set(cat.value, 0);
     });
 
-    // 실제 지출 데이터 추가
-    props.annuallyTotalExpenses.forEach(expense => {
+    const ExpensesData = props.monthlyExpenses ?? props.annuallyTotalExpenses;
+    ExpensesData.forEach(expense => {
         const category = expense.category || 'other';
         const price = Number(expense.price);
         categoryMap.set(category, (categoryMap.get(category) || 0) + price);
@@ -137,7 +138,13 @@ watch(
 
 <template>
     <div class="category-summary">
-        <h3>{{ currentYear }} 소비 항목 통계</h3>
+        <h3>
+            {{
+                monthlyExpenses
+                    ? `${currentYear}년 ${selectedMonth}월 소비 항목 통계`
+                    : `${currentYear} 소비 항목 통계`
+            }}
+        </h3>
         <div v-if="isLoading" class="loading-spinner"></div>
         <div v-else-if="categoryData.length === 0" class="no-data">데이터가 없습니다</div>
         <div v-else>
