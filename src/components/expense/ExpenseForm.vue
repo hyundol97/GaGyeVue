@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { supabase } from '../../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -17,6 +17,8 @@ const emit = defineEmits<{
     complete: [data: any];
     cancel: [];
 }>();
+
+const showToast = inject<(message: string, type?: 'success' | 'error') => void>('showToast');
 
 const currentStep = ref(1);
 const isSubmitting = ref(false);
@@ -94,7 +96,7 @@ const submitForm = async () => {
         emit('complete', formData.value);
     } catch (error) {
         console.error('저장 실패:', error);
-        alert('저장에 실패했습니다. 다시 시도해주세요.');
+        showToast?.('저장에 실패했습니다. 다시 시도해주세요.', 'error');
     } finally {
         isSubmitting.value = false;
     }

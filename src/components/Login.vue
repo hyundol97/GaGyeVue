@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 
@@ -8,6 +8,8 @@ const authStore = useAuthStore();
 const emit = defineEmits<{
     login: [];
 }>();
+
+const showToast = inject<(message: string, type?: 'success' | 'error') => void>('showToast');
 
 const userMail = ref('');
 const password = ref('');
@@ -37,7 +39,7 @@ const handleLogin = async () => {
 
             if (error) {
                 console.error('로그인 오류:', error.message);
-                alert('로그인에 실패했습니다.');
+                showToast?.('로그인에 실패했습니다.', 'error');
                 return;
             }
 
@@ -47,7 +49,7 @@ const handleLogin = async () => {
             }
         } catch (error) {
             console.error('로그인 오류:', error);
-            alert('로그인에 실패했습니다.');
+            showToast?.('로그인에 실패했습니다.', 'error');
         } finally {
             isLoading.value = false;
         }

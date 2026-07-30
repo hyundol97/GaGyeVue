@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, provide } from 'vue';
 import { useAuthStore } from './stores/auth';
 
 import Login from './components/Login.vue';
 import Home from './components/Home.vue';
 import ExpenseForm from './components/expense/ExpenseForm.vue';
 import IncomeForm from './components/income/IncomeForm.vue';
+import ToastNotification from './components/ToastNotification.vue';
 
 const authStore = useAuthStore();
 const currentView = ref<'login' | 'home' | 'expenseForm' | 'incomeForm'>('login');
@@ -34,10 +35,18 @@ const startIncomeEntry = () => {
     currentView.value = 'incomeForm';
 };
 
+const toastRef = ref<InstanceType<typeof ToastNotification> | null>(null);
+const showToast = (message: string, type: 'success' | 'error' = 'success', countdown?: number) => {
+    toastRef.value?.show(message, type, countdown);
+};
+provide('showToast', showToast);
+
 const handleFormComplete = (data: any) => {
     console.log('Expense saved:', data);
-    alert('가계부 입력이 완료되었습니다!');
-    currentView.value = 'home';
+    showToast('입력 완료! 3초 후 홈으로 이동합니다.', 'success', 3);
+    setTimeout(() => {
+        currentView.value = 'home';
+    }, 3000);
 };
 
 const handleFormCancel = () => {
@@ -47,6 +56,7 @@ const handleFormCancel = () => {
 
 <template>
     <div id="app">
+        <ToastNotification ref="toastRef" />
         <Login v-if="currentView === 'login'" @login="handleLogin" />
         <Home
             v-if="currentView === 'home'"
